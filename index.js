@@ -1,6 +1,9 @@
 const express = require('express');
+const birds = require('./birds')
 
 const app = express();
+
+app.use('/birds', birds)
 
 app.all('/secret', (req, res, next) => {
     console.log('Accessing the secret section ...')
