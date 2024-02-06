@@ -5,13 +5,28 @@ const app = express();
 
 app.use('/birds', birds)
 
+app.get('/user/:id', (req, res, next) => {
+    // if the user ID is 0, skip to the next route
+    if (req.params.id === '0') next('route')
+    // otherwise pass the control to the next middleware function in this stack
+    else next()
+}, (req, res, next) => {
+    // send a regular response
+    res.send('regular')
+})
+
+// handler for the /user/:id path, which sends a special response
+app.get('/user/:id', (req, res, next) => {
+    res.send('special')
+})
+
 app.all('/secret', (req, res, next) => {
     console.log('Accessing the secret section ...')
     next() // pass control to the next handler
 })
 
 app.get('/', (req, res) => {
-    res.sendStatus(200);
+    throw new Error("Hello");
 })
 
 app.get('/example/a', (req, res) => {
@@ -60,6 +75,11 @@ app.delete('/user', (req, res) => {
 
 app.all('/secret', (req, res, next) => {
     res.send("Hello From Secret")
+})
+
+app.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).send('Something broke!')
 })
 
 app.listen(3000, () => {
